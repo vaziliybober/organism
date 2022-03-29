@@ -15,7 +15,7 @@ import { getUser } from "./session.server";
 export const links: LinksFunction = () => {
   return [
     { rel: "icon", href: "/favicon.ico" },
-    { rel: "apple-touch-icon", href: "/logo192.png" },
+    { rel: "apple-touch-icon", href: "/logo128.png" },
     { rel: "stylesheet", href: tailwindStylesheetUrl },
     { rel: "manifest", href: "/manifest.json" },
   ];
