@@ -13,13 +13,20 @@ import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getUser } from "./session.server";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+  return [
+    { rel: "icon", href: "/favicon.ico" },
+    { rel: "apple-touch-icon", href: "/logo192.png" },
+    { rel: "stylesheet", href: tailwindStylesheetUrl },
+    { rel: "manifest", href: "/manifest.json" },
+  ];
 };
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "Remix Notes",
+  title: "Organism",
+  description: "An organiser app",
   viewport: "width=device-width,initial-scale=1",
+  "theme-color": "#000000",
 });
 
 type LoaderData = {
