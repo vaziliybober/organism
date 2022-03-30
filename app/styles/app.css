@@ -33,4 +33,9 @@
   h3 {
     @apply text-lg;
   }
+
+  input {
+    @apply text-gray-700;
+    @apply rounded-sm;
+  }
 }

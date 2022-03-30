@@ -10,7 +10,8 @@ import {
 import type { LinksFunction, MetaFunction, LoaderFunction } from "remix";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "./session.server";
+import { getUser } from "~/session.server";
+import { User } from "@prisma/client";
 
 export const links: LinksFunction = () => {
   return [
@@ -30,7 +31,7 @@ export const meta: MetaFunction = () => ({
 });
 
 type LoaderData = {
-  user: Awaited<ReturnType<typeof getUser>>;
+  user: User | null;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
