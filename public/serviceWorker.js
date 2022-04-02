@@ -1,4 +1,8 @@
 self.addEventListener("fetch", (event) => {
+  if (!event.request.url.startsWith("http")) {
+    return;
+  }
+
   let url = new URL(event.request.url);
   let method = event.request.method;
 

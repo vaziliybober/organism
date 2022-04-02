@@ -1,5 +1,4 @@
 import {
-  json,
   Links,
   LiveReload,
   Meta,
@@ -7,11 +6,9 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
-import type { LinksFunction, MetaFunction, LoaderFunction } from "remix";
+import type { LinksFunction, MetaFunction } from "remix";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "~/session.server";
-import { User } from "@prisma/client";
 
 export const links: LinksFunction = () => {
   return [
@@ -29,16 +26,6 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
   "theme-color": "#000000",
 });
-
-type LoaderData = {
-  user: User | null;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  return json<LoaderData>({
-    user: await getUser(request),
-  });
-};
 
 export default function App() {
   return (

@@ -13,15 +13,15 @@ import {
   json,
   useActionData,
 } from "remix";
-
-import { getUserId, createUserSession } from "~/session.server";
-
-import { createUser, getUserByEmail } from "~/models/user.server";
+import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import classnames from "tailwindcss-classnames";
+import { emailTransporter, getUserIdFromSession } from "~/utils.server";
+import { prisma } from "~/db.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserId(request);
+  const userId = await getUserIdFromSession(request);
   if (userId) return redirect("/");
   return json({});
 };
@@ -30,6 +30,7 @@ type ActionData = {
   errors?: {
     email?: string;
     password?: string;
+    submit?: string;
   };
   data?: {
     email: string;
@@ -52,8 +53,8 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
-  const existingUser = await getUserByEmail(email);
-  if (existingUser) {
+  let user = await prisma.user.findUnique({ where: { email } });
+  if (user && user.verified) {
     return json<ActionData>(
       { errors: { email: "A user already exists with this email" } },
       { status: 400 }
@@ -77,7 +78,42 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
-  await createUser(email, password);
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const verificationToken = uuidv4();
+  if (user) {
+    user = await prisma.user.update({
+      where: { email },
+      data: { verificationToken },
+    });
+  } else {
+    user = await prisma.user.create({
+      data: {
+        email,
+        password: {
+          create: {
+            hash: hashedPassword,
+          },
+        },
+        verificationToken,
+      },
+    });
+  }
+  const { origin } = new URL(request.url);
+  const link = `${origin}/verify?email=${email}&verificationToken=${verificationToken}`;
+  try {
+    await emailTransporter.sendMail({
+      from: `"Organism" <organism-0555@mail.ru>`,
+      to: email,
+      subject: "Confirm your email ✔",
+      html: `<p>You've received a confirmation link for your new account at Organism.</p>
+      <p>To confirm your account, follow this link: <a href=${link}>${link}</p>`,
+    });
+  } catch (err) {
+    return json<ActionData>(
+      { errors: { submit: "Failed to send a confirmation email" } },
+      { status: 500 }
+    );
+  }
 
   return json<ActionData>({ data: { email } });
 };
@@ -164,13 +200,20 @@ export default function Join() {
               )}
             </div>
           </div>
-          <button
-            type="submit"
-            disabled={!!transition.submission}
-            className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-          >
-            {transition.submission ? "Creating account..." : "Create Account"}
-          </button>
+          <div>
+            <button
+              type="submit"
+              disabled={!!transition.submission}
+              className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+            >
+              {transition.submission ? "Creating account..." : "Create Account"}
+            </button>
+            {actionData?.errors?.submit && (
+              <div className="pt-1 text-red-700">
+                {actionData.errors.submit}
+              </div>
+            )}
+          </div>
           <div className="flex items-center justify-center">
             <div className="text-center text-sm text-gray-500">
               Already have an account?{" "}

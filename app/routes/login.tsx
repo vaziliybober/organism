@@ -10,17 +10,18 @@ import {
   useTransition,
 } from "remix";
 import type { LoaderFunction } from "remix";
-import { createUserSession, getUserId } from "~/session.server";
-import { verifyLogin } from "~/models/user.server";
+import { getUserIdFromSession, login } from "~/utils.server";
+import { prisma } from "~/db.server";
+import bcrypt from "bcryptjs";
 
 type ActionData = {
   error?: string;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserId(request);
+  const userId = await getUserIdFromSession(request);
   if (userId) return redirect("/");
-  return null;
+  return json({});
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -36,16 +37,26 @@ export const action: ActionFunction = async ({ request }) => {
   if (typeof email !== "string" || typeof password !== "string") {
     return errorResponse;
   }
-  const user = await verifyLogin(email, password);
-  if (!user) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      password: true,
+    },
+  });
+  if (
+    !user ||
+    !user.password ||
+    !user.verified ||
+    !(await bcrypt.compare(password, user.password.hash))
+  ) {
     return errorResponse;
   }
-  return createUserSession({
+  return await login(
     request,
-    userId: user.id,
-    remember: remember === "on" ? true : false,
-    redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
-  });
+    user.id,
+    typeof redirectTo === "string" ? redirectTo : "/",
+    remember === "on"
+  );
 };
 
 export const meta: MetaFunction = () => {

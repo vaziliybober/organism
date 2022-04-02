@@ -1,9 +1,19 @@
-import { Link } from "remix";
+import { User } from "@prisma/client";
+import { json, Link, LoaderFunction, useLoaderData } from "remix";
 import logo from "~/logo.png";
-import { useMaybeUser } from "~/utils";
+import { getCurrentUser } from "~/utils.server";
+
+type LoaderData = {
+  user: User | null;
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getCurrentUser(request);
+  return json<LoaderData>({ user });
+};
 
 export default function Index() {
-  const user = useMaybeUser();
+  const { user } = useLoaderData<LoaderData>();
 
   return (
     <main className="flex h-full flex-col items-center p-8">
