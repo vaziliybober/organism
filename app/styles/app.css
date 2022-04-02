@@ -3,39 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply text-gray-100;
-    @apply bg-gray-900;
-    @apply sm:text-xl;
-  }
-
-  a {
-    display: inline-block;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: bold;
-  }
-
-  h1 {
-    @apply text-5xl;
-  }
-
-  h2 {
-    @apply text-2xl;
-  }
-
-  h3 {
-    @apply text-lg;
-  }
-
   input {
-    @apply text-gray-700;
-    @apply rounded-sm;
+    background-color: #e8f0fe;
   }
 }
