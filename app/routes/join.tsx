@@ -18,6 +18,7 @@ import { getUserId, createUserSession } from "~/session.server";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { z } from "zod";
+import classnames from "tailwindcss-classnames";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -25,18 +26,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({});
 };
 
-interface ActionData {
-  errors: {
+type ActionData = {
+  errors?: {
     email?: string;
     password?: string;
   };
-}
+  data?: {
+    email: string;
+  };
+};
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  const redirectTo = formData.get("redirectTo");
   if (typeof email !== "string" || email.length === 0) {
     return json<ActionData>(
       { errors: { email: "Email is required" } },
@@ -74,13 +77,9 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
-  const user = await createUser(email, password);
-  return createUserSession({
-    request,
-    userId: user.id,
-    remember: false,
-    redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
-  });
+  await createUser(email, password);
+
+  return json<ActionData>({ data: { email } });
 };
 
 export const meta: MetaFunction = () => {
@@ -91,8 +90,8 @@ export const meta: MetaFunction = () => {
 
 export default function Join() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const actionData = useActionData<ActionData>();
+  const success = !!actionData?.data;
   const transition = useTransition();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -106,7 +105,12 @@ export default function Join() {
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
-        <Form method="post" className="space-y-6" noValidate replace>
+        <Form
+          method="post"
+          className={classnames("space-y-6", { hidden: success })}
+          noValidate
+          replace
+        >
           <div>
             <label
               htmlFor="email"
@@ -160,7 +164,6 @@ export default function Join() {
               )}
             </div>
           </div>
-          <input type="hidden" name="redirectTo" value={redirectTo} />
           <button
             type="submit"
             disabled={!!transition.submission}
@@ -183,6 +186,26 @@ export default function Join() {
             </div>
           </div>
         </Form>
+        <div className={classnames({ hidden: !success })}>
+          <p>
+            A confirmation link has been sent to your email address:{" "}
+            {actionData?.data?.email}
+          </p>
+          <div className="mt-4 flex flex-wrap justify-between gap-4">
+            <Link
+              to="."
+              className="rounded-lg bg-red-500 px-9 py-3 font-medium text-white hover:bg-red-600"
+            >
+              Try again
+            </Link>
+            <Link
+              to="/login"
+              className="rounded-lg bg-green-500 px-16 py-3 font-medium text-white hover:bg-green-600"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
