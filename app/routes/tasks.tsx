@@ -10,12 +10,9 @@ export default function Tasks() {
           <SettingsSvg width={32} height={32} className="fill-blue-600" />
         </Link>
       </header>
-      <div className="mt-16">
-        <nav className="fixed top-16 bottom-0 w-72 border-r p-4"></nav>
-        <main className="ml-72 flex-grow">
-          <Outlet />
-        </main>
-      </div>
+      <main className="mt-16">
+        <Outlet />
+      </main>
     </>
   );
 }

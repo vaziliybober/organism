@@ -21,9 +21,11 @@ export default function Index() {
       <ul>
         {data.tasks.map((task) => (
           <li key={task.id} className="even:bg-gray-100">
-            <h2 className="border-b p-4 font-bold text-gray-700">
-              {task.title}
-            </h2>
+            <Link to={task.id}>
+              <h2 className="border-b p-4 font-bold text-gray-700">
+                {task.title}
+              </h2>
+            </Link>
           </li>
         ))}
       </ul>
