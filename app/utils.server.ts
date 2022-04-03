@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { createCookieSessionStorage, redirect } from "remix";
 import invariant from "tiny-invariant";
@@ -33,14 +32,6 @@ function getSession(request: Request) {
   return sessionStorage.getSession(cookie);
 }
 
-export async function getUserIdFromSession(
-  request: Request
-): Promise<string | undefined> {
-  const session = await getSession(request);
-  const userId = session.get(USER_SESSION_KEY);
-  return userId;
-}
-
 export async function login(
   request: Request,
   userId: string,
@@ -69,37 +60,23 @@ export async function logout(request: Request) {
   });
 }
 
-export async function getCurrentUser(
-  request: Request,
-  query: (id: string) => Promise<User | null> = (id: string) =>
-    prisma.user.findUnique({ where: { id } })
-) {
-  const userId = await getUserIdFromSession(request);
+export async function getCurrentUser(request: Request) {
+  const session = await getSession(request);
+  const userId = session.get(USER_SESSION_KEY);
   if (!userId) {
     return null;
   }
-  const user = await query(userId);
+  const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !user.verified) {
-    return null;
-  }
-  return user;
-}
-
-export async function requireCurrentUser(
-  request: Request,
-  query: (id: string) => Promise<User | null>
-) {
-  const user = await getCurrentUser(request, query);
-  if (!user) {
     throw await logout(request);
   }
   return user;
 }
 
-export async function queryVerifiedUser(query: () => Promise<User | null>) {
-  const user = await query();
-  if (!user || !user.verified) {
-    return null;
+export async function requireCurrentUser(request: Request) {
+  const user = await getCurrentUser(request);
+  if (!user) {
+    throw await logout(request);
   }
   return user;
 }

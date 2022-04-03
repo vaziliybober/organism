@@ -17,12 +17,14 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import classnames from "tailwindcss-classnames";
-import { emailTransporter, getUserIdFromSession } from "~/utils.server";
+import { emailTransporter, getCurrentUser } from "~/utils.server";
 import { prisma } from "~/db.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserIdFromSession(request);
-  if (userId) return redirect("/");
+  const user = await getCurrentUser(request);
+  if (user) {
+    return redirect("/");
+  }
   return json({});
 };
 
@@ -139,7 +141,7 @@ export default function Join() {
     }
   }, [actionData]);
   return (
-    <div className="flex min-h-full flex-col justify-center">
+    <div className="flex h-screen flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <Form
           method="post"
@@ -159,7 +161,7 @@ export default function Join() {
                 ref={emailRef}
                 id="email"
                 required
-                autoFocus={true}
+                autoFocus
                 name="email"
                 type="email"
                 autoComplete="email"

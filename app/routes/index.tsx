@@ -16,14 +16,20 @@ export default function Index() {
   const { user } = useLoaderData<LoaderData>();
 
   return (
-    <main className="flex h-full flex-col items-center p-8">
+    <main className="flex h-screen flex-col items-center p-8">
       <h1 className="mt-14 mb-10 text-5xl">Organism</h1>
       <img src={logo} alt="logo" className="w-[256px] sm:w-[350px]" />
       <div className="mt-auto">
         {user ? (
           <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              to="tasks"
+              className="rounded-lg bg-blue-500 px-16 py-3 font-medium text-white hover:bg-blue-600"
+            >
+              Tasks
+            </Link>
             <form action="/logout" method="post">
-              <button className="rounded-lg bg-red-500 px-9 py-3 font-medium text-white hover:bg-red-600">
+              <button className="rounded-lg bg-red-500 px-16 py-3 font-medium text-white hover:bg-red-600">
                 Log out
               </button>
             </form>
@@ -31,13 +37,13 @@ export default function Index() {
         ) : (
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              to="/login"
+              to="login"
               className="rounded-lg bg-green-500 px-16 py-3 font-medium text-white hover:bg-green-600"
             >
               Sign in
             </Link>
             <Link
-              to="/join"
+              to="join"
               className="rounded-lg bg-yellow-500 px-16 py-3 font-medium text-white hover:bg-yellow-600"
             >
               Sign up

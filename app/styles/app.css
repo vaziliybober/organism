@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  input {
+  input,
+  textarea {
     background-color: #e8f0fe;
   }
 }

@@ -10,7 +10,7 @@ import {
   useTransition,
 } from "remix";
 import type { LoaderFunction } from "remix";
-import { getUserIdFromSession, login } from "~/utils.server";
+import { getCurrentUser, login } from "~/utils.server";
 import { prisma } from "~/db.server";
 import bcrypt from "bcryptjs";
 
@@ -19,8 +19,10 @@ type ActionData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await getUserIdFromSession(request);
-  if (userId) return redirect("/");
+  const user = await getCurrentUser(request);
+  if (user) {
+    return redirect("/");
+  }
   return json({});
 };
 
@@ -78,7 +80,7 @@ export default function Login() {
           Email verified
         </div>
       )}
-      <div className="flex min-h-full flex-col justify-center">
+      <div className="flex h-screen flex-col justify-center">
         <div className="mx-auto w-full max-w-md px-8">
           <Form method="post" className="space-y-6" noValidate replace>
             <div>
@@ -92,7 +94,7 @@ export default function Login() {
                 <input
                   id="email"
                   required
-                  autoFocus={true}
+                  autoFocus
                   name="email"
                   type="email"
                   autoComplete="email"
@@ -100,7 +102,6 @@ export default function Login() {
                 />
               </div>
             </div>
-
             <div>
               <label
                 htmlFor="password"
