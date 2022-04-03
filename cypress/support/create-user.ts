@@ -6,8 +6,9 @@
 
 import { parse } from "cookie";
 import { installGlobals } from "@remix-run/node/globals";
-import { createUserSession } from "~/session.server";
-import { createUser } from "~/models/user.server";
+import bcrypt from "bcryptjs";
+import { prisma } from "~/db.server";
+import { login } from "~/utils.server";
 
 installGlobals();
 
@@ -19,14 +20,20 @@ async function createAndLogin(email: string) {
     throw new Error("All test emails must end in @example.com");
   }
 
-  const user = await createUser(email, "myreallystrongpassword");
-
-  const response = await createUserSession({
-    request: new Request(""),
-    userId: user.id,
-    remember: false,
-    redirectTo: "/",
+  const hashedPassword = await bcrypt.hash("myreallystrongpassword", 10);
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+      verified: true,
+    },
   });
+
+  const response = await login(new Request(""), user.id, "/", false);
 
   const cookieValue = response.headers.get("Set-Cookie");
   if (!cookieValue) {
