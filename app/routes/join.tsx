@@ -141,8 +141,8 @@ export default function Join() {
     }
   }, [actionData]);
   return (
-    <div className="flex h-screen flex-col justify-center">
-      <div className="mx-auto w-full max-w-md px-8">
+    <div className="flex h-screen flex-col justify-center p-4">
+      <div className="mx-auto w-full max-w-md">
         <Form
           method="post"
           className={classnames("space-y-6", { hidden: success })}
@@ -232,24 +232,16 @@ export default function Join() {
           </div>
         </Form>
         <div className={classnames({ hidden: !success })}>
-          <p>
+          <p className="mb-4 text-center">
             A confirmation link has been sent to your email address:{" "}
             {actionData?.data?.email}
           </p>
-          <div className="mt-4 flex flex-wrap justify-between gap-4">
-            <Link
-              to="."
-              className="rounded-lg bg-red-500 px-9 py-3 font-medium text-white hover:bg-red-600"
-            >
-              Try again
-            </Link>
-            <Link
-              to="/login"
-              className="rounded-lg bg-green-500 px-16 py-3 font-medium text-white hover:bg-green-600"
-            >
-              Sign in
-            </Link>
-          </div>
+          <Link
+            to="."
+            className="block w-full rounded bg-red-500 py-2 px-4  text-center font-medium text-white hover:bg-red-600 focus:bg-red-400"
+          >
+            Try again
+          </Link>
         </div>
       </div>
     </div>
