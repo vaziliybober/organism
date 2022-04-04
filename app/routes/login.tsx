@@ -80,8 +80,8 @@ export default function Login() {
           Email verified
         </div>
       )}
-      <div className="flex h-screen flex-col justify-center">
-        <div className="mx-auto w-full max-w-md px-8">
+      <div className="flex h-screen flex-col justify-center p-4">
+        <div className="mx-auto w-full max-w-md">
           <Form method="post" className="space-y-6" noValidate replace>
             <div>
               <label
@@ -134,7 +134,7 @@ export default function Login() {
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center">
                 <input
                   id="remember"

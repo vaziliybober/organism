@@ -16,7 +16,7 @@ export default function Index() {
   const { user } = useLoaderData<LoaderData>();
 
   return (
-    <main className="flex h-screen flex-col items-center p-8">
+    <main className="flex h-screen flex-col items-center p-4">
       <h1 className="mt-14 mb-10 text-5xl font-bold text-gray-700">Organism</h1>
       <RibsSvg width={150} height={150} className="fill-gray-700" />
       <p className="mt-7 text-center">

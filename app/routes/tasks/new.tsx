@@ -41,7 +41,7 @@ export default function New() {
   return (
     <Form
       method="post"
-      className="max-w-3xl space-y-6 py-7 px-10"
+      className="max-w-3xl space-y-6 py-7 px-4"
       noValidate
       replace
     >
