@@ -31,7 +31,10 @@ export default function Index() {
             Tasks
           </Link>
           <form action="/logout" method="post">
-            <button className="block w-full rounded bg-red-500 py-2 px-4  text-center font-medium text-white hover:bg-red-600 focus:bg-red-400">
+            <button
+              type="submit"
+              className="block w-full rounded bg-red-500 py-2 px-4  text-center font-medium text-white hover:bg-red-600 focus:bg-red-400"
+            >
               Log out
             </button>
           </form>
