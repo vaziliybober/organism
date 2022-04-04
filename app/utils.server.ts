@@ -17,13 +17,14 @@ const sessionStorage = createCookieSessionStorage({
   },
 });
 
+invariant(process.env.MAIL_PASSWORD, "MAIL_PASSWORD must be set");
 export const emailTransporter = nodemailer.createTransport({
   host: "smtp.mail.ru",
   port: 465,
   secure: true,
   auth: {
-    user: "organism-0555@mail.ru",
-    pass: "1DDkSgsJb6GnECVTd1hC",
+    user: "organism-21@mail.ru",
+    pass: process.env.MAIL_PASSWORD,
   },
 });
 

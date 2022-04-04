@@ -104,7 +104,7 @@ export const action: ActionFunction = async ({ request }) => {
   const link = `${origin}/verify?email=${email}&verificationToken=${verificationToken}`;
   try {
     await emailTransporter.sendMail({
-      from: `"Organism" <organism-0555@mail.ru>`,
+      from: `"Organism" <organism-21@mail.ru>`,
       to: email,
       subject: "Confirm your email ✔",
       html: `<p>You've received a confirmation link for your new account at Organism.</p>
