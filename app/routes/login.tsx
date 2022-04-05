@@ -75,10 +75,6 @@ export default function Login() {
   const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
-  const emailRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    emailRef.current?.focus();
-  }, [actionData]);
   return (
     <>
       {emailVerified && (
@@ -104,7 +100,6 @@ export default function Login() {
                   type="email"
                   autoComplete="email"
                   defaultValue={actionData?.values?.email}
-                  ref={emailRef}
                   className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
                 />
               </div>
