@@ -8,3 +8,9 @@
     background-color: #e8f0fe;
   }
 }
+
+@layer utilities {
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

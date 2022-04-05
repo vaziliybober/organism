@@ -37,8 +37,6 @@ export const action: ActionFunction = async ({ request }) => {
   const { email, password } = formValues;
   invariant(typeof email === "string" && typeof password === "string");
   const remember = !!formValues.remember;
-  const redirectTo =
-    typeof formValues.redirectTo === "string" ? formValues.redirectTo : "/";
   const user = await prisma.user.findUnique({
     where: { email },
     include: {
@@ -59,7 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
       { status: 400 }
     );
   }
-  return await login(request, user.id, redirectTo, remember);
+  return await login(request, user.id, remember);
 };
 
 export const meta: MetaFunction = () => {
@@ -71,7 +69,6 @@ export const meta: MetaFunction = () => {
 export default function Login() {
   const [searchParams] = useSearchParams();
   const emailVerified = !!searchParams.get("emailVerified");
-  const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
   return (
@@ -120,7 +117,6 @@ export default function Login() {
                 />
               </div>
             </div>
-            <input type="hidden" name="redirectTo" value={redirectTo} />
             <div>
               <button
                 type="submit"

@@ -13,6 +13,7 @@ import NotTickedSvg from "~/icons/not-ticked";
 import Ticked from "~/icons/ticked";
 import { requireCurrentUser } from "~/utils.server";
 import { useEffect, useState } from "react";
+import { PageLayout } from "~/utils";
 
 type LoaderData = {
   tasks: Task[];
@@ -27,7 +28,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const taskId = formData.get("taskId");
-  console.log(taskId);
   const completed = formData.get("completed") === "true" ? true : false;
   if (typeof taskId !== "string") {
     return json({}, { status: 400 });
@@ -42,7 +42,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Index() {
   const data = useLoaderData<LoaderData>();
   return (
-    <>
+    <PageLayout title="Tasks">
       <ul>
         {data.tasks.map((task) => (
           <TaskListItem key={task.id} task={task} />
@@ -55,7 +55,7 @@ export default function Index() {
           height={48}
         />
       </Link>
-    </>
+    </PageLayout>
   );
 }
 
@@ -65,7 +65,6 @@ function TaskListItem({ task }: { task: Task }) {
   const [ticked, setTicked] = useState(task.completed);
   useEffect(() => {
     if (fetcher.state === "idle") {
-      console.log("hi");
       setTicked(task.completed);
     }
   }, [task.completed, fetcher.state]);
@@ -82,7 +81,7 @@ function TaskListItem({ task }: { task: Task }) {
       >
         <button
           type="submit"
-          className="my-auto p-2"
+          className="no-tap-highlight my-auto touch-none p-2 focus:bg-none focus:outline-none active:bg-none active:outline-none"
           onClick={() => setTicked((old) => !old)}
         >
           {ticked ? (

@@ -16,7 +16,7 @@ import {
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import classnames from "tailwindcss-classnames";
+import classnames from "classnames";
 import { emailTransporter, getCurrentUser } from "~/utils.server";
 import { prisma } from "~/db.server";
 import invariant from "tiny-invariant";

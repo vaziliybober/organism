@@ -23,8 +23,12 @@ export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   return (
     <>
-      <h2 className="mt-4 text-center font-bold">{data.task.title}</h2>
-      <div className="text-center">{data.task.description}</div>
+      <header className="p-4">
+        <h2 className="text-center font-bold">{data.task.title}</h2>
+      </header>
+      <main className="p-4">
+        <div className="">Описание: {data.task.description}</div>
+      </main>
     </>
   );
 }

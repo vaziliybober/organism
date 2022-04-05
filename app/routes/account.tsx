@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import { json, LoaderFunction, useLoaderData } from "remix";
+import { PageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 type LoaderData = {
@@ -13,12 +14,5 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Account() {
   const data = useLoaderData<LoaderData>();
-  return (
-    <>
-      <header className="border-b bg-gray-100 py-4">
-        <h1 className="text-center text-2xl font-bold">Account</h1>
-      </header>
-      <main className="h-screen">Email: {data.user.email}</main>
-    </>
-  );
+  return <PageLayout title="Account">Email: {data.user.email}</PageLayout>;
 }

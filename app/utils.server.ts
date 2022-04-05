@@ -36,12 +36,11 @@ function getSession(request: Request) {
 export async function login(
   request: Request,
   userId: string,
-  redirectTo: string = "/",
   remember: boolean = false
 ) {
   const session = await getSession(request);
   session.set(USER_SESSION_KEY, userId);
-  return redirect(redirectTo, {
+  return redirect("/", {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
         maxAge: remember

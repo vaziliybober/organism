@@ -1,6 +1,6 @@
 import { SVGProps } from "react";
 
-export default function Ticked(props: SVGProps<SVGSVGElement>) {
+export default function TickedSvg(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

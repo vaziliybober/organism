@@ -33,7 +33,7 @@ async function createAndLogin(email: string) {
     },
   });
 
-  const response = await login(new Request(""), user.id, "/", false);
+  const response = await login(new Request(""), user.id, false);
 
   const cookieValue = response.headers.get("Set-Cookie");
   if (!cookieValue) {
