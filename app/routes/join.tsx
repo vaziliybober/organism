@@ -19,6 +19,7 @@ import { z } from "zod";
 import classnames from "tailwindcss-classnames";
 import { emailTransporter, getCurrentUser } from "~/utils.server";
 import { prisma } from "~/db.server";
+import invariant from "tiny-invariant";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getCurrentUser(request);
@@ -34,51 +35,41 @@ type ActionData = {
     password?: string;
     submit?: string;
   };
-  data?: {
+  values?: {
     email: string;
   };
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-  if (typeof email !== "string" || email.length === 0) {
-    return json<ActionData>(
-      { errors: { email: "Email is required" } },
-      { status: 400 }
-    );
+  const formValues = Object.fromEntries(formData);
+  const { email, password } = formValues;
+  invariant(typeof email === "string" && typeof password === "string");
+  let emailErrorMessage, passwordErrorMessage;
+  if (email.length === 0) {
+    emailErrorMessage = "Email is required";
   }
   if (!z.string().email().safeParse(email).success) {
-    return json<ActionData>(
-      { errors: { email: "Email is invalid" } },
-      { status: 400 }
-    );
+    emailErrorMessage = "Email is invalid";
   }
   let user = await prisma.user.findUnique({ where: { email } });
   if (user && user.verified) {
-    return json<ActionData>(
-      { errors: { email: "A user already exists with this email" } },
-      { status: 400 }
-    );
+    emailErrorMessage = "A user already exists with this email";
   }
   if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Password is required" } },
-      { status: 400 }
-    );
+    passwordErrorMessage = "Password is required";
   }
   if (password.length < 8) {
-    return json<ActionData>(
-      { errors: { password: "Password is too short" } },
-      { status: 400 }
-    );
+    passwordErrorMessage = "Password is too short";
   }
   if (password.length > 32) {
-    return json<ActionData>(
-      { errors: { password: "Password is too long" } },
-      { status: 400 }
-    );
+    passwordErrorMessage = "Password is too long";
+  }
+  if (emailErrorMessage || passwordErrorMessage) {
+    return json<ActionData>({
+      errors: { email: emailErrorMessage, password: passwordErrorMessage },
+      values: { email },
+    });
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   const verificationToken = uuidv4();
@@ -117,7 +108,7 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
 
-  return json<ActionData>({ data: { email } });
+  return json<ActionData>({ values: { email } });
 };
 
 export const meta: MetaFunction = () => {
@@ -129,12 +120,12 @@ export const meta: MetaFunction = () => {
 export default function Join() {
   const [searchParams] = useSearchParams();
   const actionData = useActionData<ActionData>();
-  const success = !!actionData?.data;
+  const success = actionData && !actionData.errors;
   const transition = useTransition();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
-    if (actionData?.errors?.email) {
+    if (!actionData || actionData?.errors?.email) {
       emailRef.current?.focus();
     } else if (actionData?.errors?.password) {
       passwordRef.current?.focus();
@@ -160,13 +151,13 @@ export default function Join() {
               <input
                 ref={emailRef}
                 id="email"
-                required
-                autoFocus
+                autoFocus={!actionData || !!actionData?.errors?.email}
                 name="email"
                 type="email"
                 autoComplete="email"
                 aria-invalid={actionData?.errors?.email ? true : undefined}
                 aria-describedby="email-error"
+                defaultValue={actionData?.values?.email}
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
               />
               {actionData?.errors?.email && (
@@ -187,6 +178,9 @@ export default function Join() {
             <div className="mt-1">
               <input
                 id="password"
+                autoFocus={
+                  !actionData?.errors?.email && !!actionData?.errors?.password
+                }
                 ref={passwordRef}
                 name="password"
                 type="password"
@@ -234,7 +228,7 @@ export default function Join() {
         <div className={classnames({ hidden: !success })}>
           <p className="mb-4 text-center">
             A confirmation link has been sent to your email address:{" "}
-            {actionData?.data?.email}
+            {actionData?.values?.email}
           </p>
           <Link
             to="."

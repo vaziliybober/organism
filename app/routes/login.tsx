@@ -75,9 +75,9 @@ export default function Login() {
   const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
-  const emailInputRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    emailInputRef.current?.focus();
+    emailRef.current?.focus();
   }, [actionData]);
   return (
     <>
@@ -99,13 +99,12 @@ export default function Login() {
               <div className="mt-1">
                 <input
                   id="email"
-                  required
                   autoFocus
                   name="email"
                   type="email"
                   autoComplete="email"
                   defaultValue={actionData?.values?.email}
-                  ref={emailInputRef}
+                  ref={emailRef}
                   className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
                 />
               </div>
