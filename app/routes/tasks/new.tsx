@@ -6,6 +6,7 @@ import {
   useActionData,
   useTransition,
 } from "remix";
+import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import { requireCurrentUser } from "~/utils.server";
 
@@ -13,24 +14,31 @@ type ActionData = {
   errors?: {
     title?: string;
   };
+  values?: {
+    title: string;
+    description: string;
+  };
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const user = await requireCurrentUser(request);
   const formData = await request.formData();
-  const title = formData.get("title");
-  let description = formData.get("description");
-  if (typeof title !== "string" || title.length === 0) {
+  const formValues = Object.fromEntries(formData);
+  const { title } = formValues;
+  invariant(
+    typeof title === "string" && typeof formValues.description === "string"
+  );
+  const description = formValues.description || null;
+
+  if (title.length === 0) {
     return json<ActionData>(
       {
         errors: { title: "Please, fill out the title" },
+        values: { title, description: formValues.description },
       },
       { status: 400 }
     );
   }
-  if (typeof description !== "string") {
-    description = "";
-  }
+  const user = await requireCurrentUser(request);
   await prisma.task.create({ data: { title, description, userId: user.id } });
   return redirect("/tasks");
 };
@@ -59,6 +67,7 @@ export default function New() {
             autoFocus
             name="title"
             type="text"
+            defaultValue={actionData?.values?.title}
             className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
           />
           {actionData?.errors?.title && (
@@ -77,6 +86,7 @@ export default function New() {
           <textarea
             id="description"
             name="description"
+            defaultValue={actionData?.values?.description}
             className="min-h-[125px] w-full rounded border border-gray-500 px-2 py-1 text-lg"
           />
         </div>
