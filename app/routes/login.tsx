@@ -13,9 +13,15 @@ import type { LoaderFunction } from "remix";
 import { getCurrentUser, login } from "~/utils.server";
 import { prisma } from "~/db.server";
 import bcrypt from "bcryptjs";
+import invariant from "tiny-invariant";
+import { useEffect, useRef } from "react";
 
 type ActionData = {
   error?: string;
+  values?: {
+    email: string;
+    remember: boolean;
+  };
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -28,17 +34,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-  const redirectTo = formData.get("redirectTo");
-  const remember = formData.get("remember");
-  const errorResponse = json<ActionData>(
-    { error: "Invalid email or password" },
-    { status: 400 }
-  );
-  if (typeof email !== "string" || typeof password !== "string") {
-    return errorResponse;
-  }
+  const formValues = Object.fromEntries(formData);
+  const { email, password } = formValues;
+  invariant(typeof email === "string" && typeof password === "string");
+  const remember = !!formValues.remember;
+  const redirectTo =
+    typeof formValues.redirectTo === "string" ? formValues.redirectTo : "/";
   const user = await prisma.user.findUnique({
     where: { email },
     include: {
@@ -51,14 +52,15 @@ export const action: ActionFunction = async ({ request }) => {
     !user.verified ||
     !(await bcrypt.compare(password, user.password.hash))
   ) {
-    return errorResponse;
+    return json<ActionData>(
+      {
+        error: "Invalid email or password",
+        values: { email, remember },
+      },
+      { status: 400 }
+    );
   }
-  return await login(
-    request,
-    user.id,
-    typeof redirectTo === "string" ? redirectTo : "/",
-    remember === "on"
-  );
+  return await login(request, user.id, redirectTo, remember);
 };
 
 export const meta: MetaFunction = () => {
@@ -73,6 +75,10 @@ export default function Login() {
   const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    emailInputRef.current?.focus();
+  }, [actionData]);
   return (
     <>
       {emailVerified && (
@@ -98,6 +104,8 @@ export default function Login() {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  defaultValue={actionData?.values?.email}
+                  ref={emailInputRef}
                   className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
                 />
               </div>
@@ -140,6 +148,7 @@ export default function Login() {
                   id="remember"
                   name="remember"
                   type="checkbox"
+                  defaultChecked={actionData?.values?.remember}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label
