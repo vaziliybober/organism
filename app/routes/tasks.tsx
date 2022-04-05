@@ -1,5 +1,11 @@
-import { Link, Outlet } from "remix";
+import { json, Link, LoaderFunction, Outlet } from "remix";
 import SettingsSvg from "~/icons/settings";
+import { requireCurrentUser } from "~/utils.server";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireCurrentUser(request);
+  return json({});
+};
 
 export default function Tasks() {
   return (

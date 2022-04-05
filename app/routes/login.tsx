@@ -14,7 +14,6 @@ import { getCurrentUser, login } from "~/utils.server";
 import { prisma } from "~/db.server";
 import bcrypt from "bcryptjs";
 import invariant from "tiny-invariant";
-import { useEffect, useRef } from "react";
 
 type ActionData = {
   error?: string;
