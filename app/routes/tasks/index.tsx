@@ -61,10 +61,10 @@ export default function Index() {
               <Form
                 method="post"
                 action="?index"
-                className="absolute right-4 top-1/2 flex -translate-y-1/2"
+                className="absolute right-2 top-1/2 flex -translate-y-1/2"
                 replace
               >
-                <button type="submit" className="my-auto">
+                <button type="submit" className="my-auto p-2">
                   <Tick ticked={task.completed} />
                 </button>
                 <input type="hidden" name="taskId" value={task.id} />
