@@ -54,7 +54,7 @@ export default function New() {
       <main>
         <Form
           method="post"
-          className="max-w-3xl space-y-6 py-7 px-4"
+          className="max-w-3xl space-y-6 py-7 px-4 mx-auto"
           noValidate
           replace
         >

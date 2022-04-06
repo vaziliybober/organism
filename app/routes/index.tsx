@@ -21,13 +21,13 @@ export default function Index() {
       <div className="mt-auto mb-5 w-full space-y-4">
         <Link
           to="login"
-          className="block w-full rounded bg-blue-500 py-2 px-4  text-center font-medium text-white hover:bg-blue-600 focus:bg-blue-400"
+          className="block mx-auto max-w-sm w-full rounded bg-blue-500 py-2 px-4  text-center font-medium text-white hover:bg-blue-600 focus:bg-blue-400"
         >
           Sign in
         </Link>
         <Link
           to="join"
-          className="block w-full rounded bg-green-500 py-2 px-4  text-center font-medium text-white hover:bg-green-600 focus:bg-green-400"
+          className="block mx-auto max-w-sm w-full rounded bg-green-500 py-2 px-4  text-center font-medium text-white hover:bg-green-600 focus:bg-green-400"
         >
           Sign up
         </Link>
