@@ -23,11 +23,11 @@ export function PageLayout({
         <HamburgerSvg
           width={29}
           height={29}
-          className="absolute top-4 left-4 z-20 md:hidden"
+          className="fixed top-4 left-4 z-20 md:hidden"
         />
       </label>
       <input id="hamburger" type="checkbox" className="peer hidden" />
-      <nav className="gr absolute top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white peer-checked:absolute peer-checked:z-10 peer-checked:block md:block">
+      <nav className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white peer-checked:z-10 peer-checked:block md:block">
         <ul>
           <li className="border-b hover:bg-gray-100">
             <NavLink

@@ -48,12 +48,8 @@ export default function Index() {
           <TaskListItem key={task.id} task={task} />
         ))}
       </ul>
-      <Link to="new">
-        <PlusSvg
-          className="absolute bottom-5 right-5 fill-green-600"
-          width={48}
-          height={48}
-        />
+      <Link to="new" className="fixed bottom-5 right-5">
+        <PlusSvg className="fill-green-600" width={48} height={48} />
       </Link>
     </PageLayout>
   );
