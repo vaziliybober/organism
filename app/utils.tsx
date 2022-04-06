@@ -16,7 +16,7 @@ export function PageLayout({
 }) {
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-10 h-16 border-b bg-gray-100 p-4">
+      <header className="fixed left-0 right-0 top-0 z-10 h-16 border-b bg-gray-100 p-4 pl-14">
         <h1 className="text-center text-2xl font-bold">{title}</h1>
       </header>
       <label htmlFor="hamburger" className="cursor-pointer select-none">

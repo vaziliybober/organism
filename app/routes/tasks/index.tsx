@@ -43,7 +43,7 @@ export default function Index() {
   const data = useLoaderData<LoaderData>();
   return (
     <PageLayout title="Tasks">
-      <ul>
+      <ul className="pb-20">
         {data.tasks.map((task) => (
           <TaskListItem key={task.id} task={task} />
         ))}
