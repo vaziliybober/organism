@@ -4,6 +4,7 @@ import {
   json,
   Link,
   LoaderFunction,
+  MetaFunction,
   useFetcher,
   useLoaderData,
 } from "remix";
@@ -14,6 +15,11 @@ import Ticked from "~/icons/ticked";
 import { requireCurrentUser } from "~/utils.server";
 import { useEffect, useState } from "react";
 import { PageLayout } from "~/utils";
+
+export const meta: MetaFunction = () => ({
+  title: "Organism | Tasks",
+  description: "Your tasks",
+});
 
 type LoaderData = {
   tasks: Task[];

@@ -1,6 +1,11 @@
-import { json, Link, LoaderFunction, redirect } from "remix";
+import { json, Link, LoaderFunction, MetaFunction, redirect } from "remix";
 import RibsSvg from "~/icons/ribs";
 import { getCurrentUser } from "~/utils.server";
+
+export const meta: MetaFunction = () => ({
+  title: "Organism | Welcome",
+  description: "Organism welcome page",
+});
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getCurrentUser(request);

@@ -1,4 +1,4 @@
-import { json, LoaderFunction, Outlet } from "remix";
+import { json, LoaderFunction, MetaFunction, Outlet } from "remix";
 import { requireCurrentUser } from "~/utils.server";
 
 export const loader: LoaderFunction = async ({ request }) => {

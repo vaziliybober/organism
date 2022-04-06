@@ -1,5 +1,10 @@
-import { LoaderFunction, redirect } from "remix";
+import { LoaderFunction, MetaFunction, redirect } from "remix";
 import { prisma } from "~/db.server";
+
+export const meta: MetaFunction = () => ({
+  title: "Organism | Verify",
+  description: "Organism email verification page",
+});
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);

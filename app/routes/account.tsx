@@ -1,7 +1,12 @@
 import { User } from "@prisma/client";
-import { json, LoaderFunction, useLoaderData } from "remix";
+import { json, LoaderFunction, MetaFunction, useLoaderData } from "remix";
 import { PageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
+
+export const meta: MetaFunction = () => ({
+  title: "Organism | Account",
+  description: "Your account",
+});
 
 type LoaderData = {
   user: User;

@@ -2,6 +2,7 @@ import {
   ActionFunction,
   Form,
   json,
+  MetaFunction,
   redirect,
   useActionData,
   useTransition,
@@ -9,6 +10,11 @@ import {
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import { requireCurrentUser } from "~/utils.server";
+
+export const meta: MetaFunction = () => ({
+  title: "Organism | New task",
+  description: "Create a new task",
+});
 
 type ActionData = {
   errors?: {
@@ -54,7 +60,7 @@ export default function New() {
       <main>
         <Form
           method="post"
-          className="max-w-3xl space-y-6 py-7 px-4 mx-auto"
+          className="mx-auto max-w-3xl space-y-6 py-7 px-4"
           noValidate
           replace
         >

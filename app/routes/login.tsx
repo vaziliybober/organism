@@ -15,6 +15,11 @@ import { prisma } from "~/db.server";
 import bcrypt from "bcryptjs";
 import invariant from "tiny-invariant";
 
+export const meta: MetaFunction = () => ({
+  title: "Organism | Sign in",
+  description: "Organism signin page",
+});
+
 type ActionData = {
   error?: string;
   values?: {
@@ -58,12 +63,6 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
   return await login(request, user.id, remember);
-};
-
-export const meta: MetaFunction = () => {
-  return {
-    title: "Sign in",
-  };
 };
 
 export default function Login() {

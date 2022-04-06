@@ -21,6 +21,11 @@ import { emailTransporter, getCurrentUser } from "~/utils.server";
 import { prisma } from "~/db.server";
 import invariant from "tiny-invariant";
 
+export const meta: MetaFunction = () => ({
+  title: "Organism | Sign up",
+  description: "Organism signup page",
+});
+
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getCurrentUser(request);
   if (user) {
@@ -109,12 +114,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   return json<ActionData>({ values: { email } });
-};
-
-export const meta: MetaFunction = () => {
-  return {
-    title: "Sign Up",
-  };
 };
 
 export default function Join() {
