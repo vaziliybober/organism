@@ -19,7 +19,7 @@ export function PageLayout({
       <header className="fixed left-0 right-0 top-0 z-10 h-16 border-b bg-gray-100 p-4">
         <h1 className="text-center text-2xl font-bold">{title}</h1>
       </header>
-      <label htmlFor="hamburger">
+      <label htmlFor="hamburger" className="cursor-pointer select-none">
         <HamburgerSvg
           width={29}
           height={29}
