@@ -15,6 +15,7 @@ import Ticked from "~/icons/ticked";
 import { requireCurrentUser } from "~/utils.server";
 import { useEffect, useState } from "react";
 import { PageLayout } from "~/utils";
+import invariant from "tiny-invariant";
 
 export const meta: MetaFunction = () => ({
   title: "Organism | Tasks",
@@ -33,13 +34,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const taskId = formData.get("taskId");
+  const formValues = Object.fromEntries(formData);
+  const { taskId } = formValues;
   const completed = formData.get("completed") === "true" ? true : false;
-  if (typeof taskId !== "string") {
-    return json({}, { status: 400 });
-  }
-  await prisma.task.update({
-    where: { id: taskId },
+  invariant(typeof taskId === "string");
+  const user = await requireCurrentUser(request);
+  await prisma.task.updateMany({
+    where: { id: taskId, userId: user.id },
     data: { completed },
   });
   return json({});

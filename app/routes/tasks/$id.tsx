@@ -22,10 +22,10 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  await requireCurrentUser(request);
+  const user = await requireCurrentUser(request);
   const { id } = params;
   invariant(typeof id === "string");
-  const task = await prisma.task.findUnique({ where: { id } });
+  const task = await prisma.task.findFirst({ where: { id, userId: user.id } });
   if (!task) {
     throw new Response("Not found", { status: 404 });
   }
