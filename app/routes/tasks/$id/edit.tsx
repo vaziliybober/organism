@@ -9,10 +9,12 @@ import {
   useActionData,
   useCatch,
   useLoaderData,
+  useParams,
   useTransition,
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
+import { BackLink } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -73,11 +75,13 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function New() {
+  const { id } = useParams();
   const data = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
   return (
     <>
+      <BackLink to={`../${id}`} />
       <header className="p-4">
         <h1 className="text-center text-xl font-bold">Edit task</h1>
       </header>

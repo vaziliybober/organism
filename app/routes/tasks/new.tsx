@@ -9,6 +9,7 @@ import {
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
+import { BackLink } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = () => ({
@@ -54,6 +55,7 @@ export default function New() {
   const transition = useTransition();
   return (
     <>
+      <BackLink />
       <header className="p-4">
         <h1 className="text-center text-xl font-bold">New task</h1>
       </header>

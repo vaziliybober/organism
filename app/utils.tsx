@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, NavLink, useLocation, useSearchParams } from "remix";
 import classnames from "classnames";
 import HamburgerSvg from "~/icons/hamburger";
+import BackSvg from "./icons/back";
 
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
@@ -84,5 +85,17 @@ export function PageLayout({
       </nav>
       <main className="mt-16 md:ml-72">{children}</main>
     </>
+  );
+}
+
+export function BackLink({ to = ".." }) {
+  return (
+    <Link
+      to={to}
+      replace
+      className="fixed top-4 left-4 rounded border-2 border-gray-400 hover:border-blue-500"
+    >
+      <BackSvg className="fill-gray-700" />
+    </Link>
   );
 }

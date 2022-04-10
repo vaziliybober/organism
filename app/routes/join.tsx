@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (user && user.verified) {
     emailErrorMessage = "A user already exists with this email";
   }
-  if (typeof password !== "string" || password.length === 0) {
+  if (password.length === 0) {
     passwordErrorMessage = "Password is required";
   }
   if (password.length < 8) {

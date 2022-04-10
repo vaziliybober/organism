@@ -14,6 +14,7 @@ import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import PencilSvg from "~/icons/pencil";
 import TrashSvg from "~/icons/trash";
+import { BackLink } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -52,6 +53,7 @@ export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   return (
     <>
+      <BackLink />
       <header className="p-4">
         <h2 className="text-center font-bold">{data.task.title}</h2>
       </header>
