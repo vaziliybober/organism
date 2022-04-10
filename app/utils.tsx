@@ -12,12 +12,6 @@ export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
-export function validateHowSoon(
-  howSoon: unknown
-): howSoon is "inbox" | "today" {
-  return howSoon === "inbox" || howSoon === "today";
-}
-
 export function PageLayout({
   children,
   title,
@@ -67,12 +61,12 @@ export function PageLayout({
       />
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white shadow-lg shadow-gray-400 peer-checked:z-10 peer-checked:block md:block"
+        className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white shadow-lg shadow-gray-400 peer-checked:z-10 peer-checked:block md:block md:shadow-none"
       >
         <ul>
           <li className="border-b hover:bg-gray-100">
             <NavLink
-              to="/tasks/inbox"
+              to="/tasks"
               className={({ isActive }) =>
                 classnames("block", "p-3", {
                   "text-blue-600": isActive,
@@ -80,20 +74,7 @@ export function PageLayout({
                 })
               }
             >
-              Inbox
-            </NavLink>
-          </li>
-          <li className="border-b hover:bg-gray-100">
-            <NavLink
-              to="/tasks/today"
-              className={({ isActive }) =>
-                classnames("block", "p-3", {
-                  "text-blue-600": isActive,
-                  "font-bold": isActive,
-                })
-              }
-            >
-              Today
+              Tasks
             </NavLink>
           </li>
           <li className="border-b hover:bg-gray-100">

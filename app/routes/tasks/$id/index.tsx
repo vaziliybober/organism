@@ -14,7 +14,7 @@ import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import PencilSvg from "~/icons/pencil";
 import TrashSvg from "~/icons/trash";
-import { capitalizeFirstLetter, NestedPageLayout } from "~/utils";
+import { NestedPageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -52,14 +52,8 @@ export const action: ActionFunction = async ({ request }) => {
 export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   return (
-    <NestedPageLayout
-      title={data.task.title}
-      backTo={`/tasks/${data.task.howSoon}`}
-    >
+    <NestedPageLayout title={data.task.title} backTo="/tasks">
       <div className="p-4">
-        <div className="inline-block rounded border-2 border-blue-500 px-2 py-1">
-          {capitalizeFirstLetter(data.task.howSoon)}
-        </div>
         <div className="mt-4">Description: {data.task.description}</div>
         <div className="pb-14" />
         <div className="fixed right-5 bottom-5 flex gap-2">

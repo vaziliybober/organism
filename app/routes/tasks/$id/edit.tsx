@@ -14,7 +14,7 @@ import {
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
-import { NestedPageLayout, validateHowSoon } from "~/utils";
+import { NestedPageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -44,7 +44,6 @@ type ActionData = {
   };
   values?: {
     title: string;
-    howSoon: string;
     description: string;
   };
 };
@@ -53,18 +52,16 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { id } = params;
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData);
-  const { title, howSoon } = formValues;
+  const { title } = formValues;
   invariant(
-    typeof title === "string" &&
-      typeof formValues.description === "string" &&
-      validateHowSoon(howSoon)
+    typeof title === "string" && typeof formValues.description === "string"
   );
   const description = formValues.description || null;
   if (title.length === 0) {
     return json<ActionData>(
       {
         errors: { title: "Please, fill out the title" },
-        values: { title, howSoon, description: formValues.description },
+        values: { title, description: formValues.description },
       },
       { status: 400 }
     );
@@ -72,7 +69,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireCurrentUser(request);
   await prisma.task.updateMany({
     where: { id, userId: user.id },
-    data: { title, howSoon, description, userId: user.id },
+    data: { title, description, userId: user.id },
   });
   return redirect(`/tasks/${id}`);
 };
@@ -82,7 +79,6 @@ export default function New() {
   const data = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
-  const howSoon = actionData?.values?.howSoon || data.task.howSoon;
   return (
     <NestedPageLayout title="Edit task" backTo={`../${id}`}>
       <Form
@@ -111,43 +107,6 @@ export default function New() {
             {actionData?.errors?.title && (
               <div className="pt-1 text-red-700">{actionData.errors.title}</div>
             )}
-          </div>
-        </div>
-        <div>
-          <p className="block text-sm font-medium text-gray-700">How soon</p>
-          <div className="flex flex-wrap gap-3">
-            <div className="mt-1">
-              <input
-                id="inbox"
-                name="howSoon"
-                value="inbox"
-                type="radio"
-                defaultChecked={howSoon === "inbox"}
-                className="peer hidden"
-              />
-              <label
-                htmlFor="inbox"
-                className="block rounded border-2 border-gray-500 px-2 py-1 peer-checked:border-blue-500"
-              >
-                Inbox
-              </label>
-            </div>
-            <div className="mt-1">
-              <input
-                id="today"
-                name="howSoon"
-                value="today"
-                type="radio"
-                defaultChecked={howSoon === "today"}
-                className="peer hidden"
-              />
-              <label
-                htmlFor="today"
-                className="block rounded border-2 border-gray-500 px-2 py-1 peer-checked:border-blue-500"
-              >
-                Today
-              </label>
-            </div>
           </div>
         </div>
         <div>
