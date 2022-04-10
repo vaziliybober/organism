@@ -12,6 +12,7 @@ model User {
   email             String    @unique
   verificationToken String?
   verified          Boolean   @default(false)
+  restorationToken  String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   password          Password?

@@ -18,7 +18,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return "Could not verify email";
   }
   if (user.verified) {
-    return redirect("/login?emailVerified=true");
+    return redirect(`/login?message=Email+verified`);
   }
   if (user.verificationToken !== verificationToken) {
     return "Could not verify email";
@@ -27,5 +27,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     where: { email },
     data: { verified: true, verificationToken: null },
   });
-  return redirect("/login?emailVerified=true");
+  return redirect(`/login?message=Email+verified`);
 };

@@ -67,16 +67,14 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Login() {
   const [searchParams] = useSearchParams();
-  const emailVerified = !!searchParams.get("emailVerified");
+  const message = searchParams.get("message");
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
   return (
     <>
-      {emailVerified && (
-        <div className="absolute left-0 right-0 bottom-0 mb-3 text-center text-green-600">
-          Email verified
-        </div>
-      )}
+      <div className="absolute left-0 right-0 bottom-0 mb-3 text-center text-green-600">
+        {message}
+      </div>
       <div className="flex h-screen flex-col justify-center p-4">
         <div className="mx-auto w-full max-w-md">
           <Form method="post" className="space-y-6" noValidate replace>
@@ -148,16 +146,24 @@ export default function Login() {
               </div>
               <div className="text-center text-sm text-gray-500">
                 Don't have an account?{" "}
-                <Link
-                  className="text-blue-500 underline"
-                  to={{
-                    pathname: "/join",
-                    search: searchParams.toString(),
-                  }}
-                >
+                <Link className="text-blue-500 underline" to="/join">
                   Sign up
                 </Link>
               </div>
+            </div>
+            <div className="text-center text-sm text-gray-500">
+              Forgot password?{" "}
+              <Link
+                className="text-blue-500 underline"
+                to={{
+                  pathname: "/forgot",
+                  search: actionData?.values?.email
+                    ? `?email=${actionData?.values?.email}`
+                    : "",
+                }}
+              >
+                Restore
+              </Link>
             </div>
           </Form>
         </div>

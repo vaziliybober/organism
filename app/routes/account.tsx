@@ -105,7 +105,7 @@ export default function Account() {
               className="w-full max-w-xs rounded border border-gray-500 px-2 py-1 text-lg"
             />
             {actionData?.errors?.oldPassword && (
-              <div className="pt-1 text-red-700" id="password-error">
+              <div className="pt-1 text-red-700" id="oldPassword-error">
                 {actionData.errors.oldPassword}
               </div>
             )}
@@ -127,7 +127,7 @@ export default function Account() {
               className="w-full max-w-xs rounded border border-gray-500 px-2 py-1 text-lg"
             />
             {actionData?.errors?.newPassword && (
-              <div className="pt-1 text-red-700" id="password-error">
+              <div className="pt-1 text-red-700" id="newPassword-error">
                 {actionData.errors.newPassword}
               </div>
             )}
