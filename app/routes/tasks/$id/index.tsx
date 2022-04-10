@@ -54,6 +54,8 @@ export default function TaskRoute() {
   return (
     <NestedPageLayout title={data.task.title} backTo="/tasks">
       <div className="p-4">
+        <div className="mt-4">From: {data.task.from}</div>
+        <div className="mt-4">To: {data.task.to}</div>
         <div className="mt-4">Description: {data.task.description}</div>
         <div className="pb-14" />
         <div className="fixed right-5 bottom-5 flex gap-2">

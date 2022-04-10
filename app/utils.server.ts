@@ -80,3 +80,11 @@ export async function requireCurrentUser(request: Request) {
   }
   return user;
 }
+
+export function dateToIso(date: Date, format = "date") {
+  const offset = date.getTimezoneOffset();
+  const isoDateTime = new Date(date.getTime() - offset * 60 * 1000)
+    .toISOString()
+    .split("Z")[0];
+  return isoDateTime;
+}

@@ -15,7 +15,7 @@ import {
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import { NestedPageLayout } from "~/utils";
-import { requireCurrentUser } from "~/utils.server";
+import { dateToIso, requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
   return {
@@ -25,7 +25,10 @@ export const meta: MetaFunction = ({ data }) => {
 };
 
 type LoaderData = {
-  task: Task;
+  task: Omit<Omit<Task, "from">, "to"> & {
+    from: string | null;
+    to: string | null;
+  };
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -35,16 +38,25 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!task) {
     throw new Response("Not found", { status: 404 });
   }
-  return json<LoaderData>({ task });
+  return json<LoaderData>({
+    task: {
+      ...task,
+      from: task.from ? dateToIso(task.from) : null,
+      to: task.to ? dateToIso(task.to) : null,
+    },
+  });
 };
 
 type ActionData = {
   errors?: {
     title?: string;
+    to?: string;
   };
   values?: {
     title: string;
     description: string;
+    from: string;
+    to: string;
   };
 };
 
@@ -52,16 +64,29 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { id } = params;
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData);
-  const { title } = formValues;
+  const { title, description, from, to } = formValues;
   invariant(
-    typeof title === "string" && typeof formValues.description === "string"
+    typeof title === "string" &&
+      typeof description === "string" &&
+      typeof from === "string" &&
+      typeof to === "string" &&
+      (from === "" || Date.parse(from)) &&
+      (to === "" || Date.parse(to))
   );
-  const description = formValues.description || null;
   if (title.length === 0) {
     return json<ActionData>(
       {
         errors: { title: "Please, fill out the title" },
-        values: { title, description: formValues.description },
+        values: { title, description, from, to },
+      },
+      { status: 400 }
+    );
+  }
+  if (new Date(to) < new Date(from)) {
+    return json<ActionData>(
+      {
+        errors: { to: "Can't be earlier than 'from'" },
+        values: { title, description, from, to },
       },
       { status: 400 }
     );
@@ -69,7 +94,12 @@ export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireCurrentUser(request);
   await prisma.task.updateMany({
     where: { id, userId: user.id },
-    data: { title, description, userId: user.id },
+    data: {
+      title,
+      description: description || null,
+      from: from ? new Date(from) : null,
+      to: to ? new Date(to) : null,
+    },
   });
   return redirect(`/tasks/${id}`);
 };
@@ -106,6 +136,43 @@ export default function New() {
             />
             {actionData?.errors?.title && (
               <div className="pt-1 text-red-700">{actionData.errors.title}</div>
+            )}
+          </div>
+        </div>
+        <div>
+          <label
+            htmlFor="from"
+            className="block text-sm font-medium text-gray-700"
+          >
+            From
+          </label>
+          <div className="mt-1">
+            <input
+              id="from"
+              name="from"
+              type="datetime-local"
+              defaultValue={actionData?.values?.from || data.task.from || ""}
+              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+            />
+          </div>
+        </div>
+        <div>
+          <label
+            htmlFor="to"
+            className="block text-sm font-medium text-gray-700"
+          >
+            To
+          </label>
+          <div className="mt-1">
+            <input
+              id="to"
+              name="to"
+              type="datetime-local"
+              defaultValue={actionData?.values?.to || data.task.to || ""}
+              className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+            />
+            {actionData?.errors?.to && (
+              <div className="pt-1 text-red-700">{actionData.errors?.to}</div>
             )}
           </div>
         </div>
