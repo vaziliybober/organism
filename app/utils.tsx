@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Link, NavLink } from "remix";
 import classnames from "classnames";
 import HamburgerSvg from "~/icons/hamburger";
@@ -25,20 +25,50 @@ export function PageLayout({
   children?: ReactNode;
   title?: string;
 }) {
+  const navRef = useRef<HTMLElement>(null);
+  const hamburgerRef = useRef<HTMLInputElement>(null);
+  const hamburgerLabelRef = useRef<HTMLLabelElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (
+        hamburgerRef.current &&
+        !navRef.current?.contains(event.target) &&
+        !hamburgerLabelRef.current?.contains(event.target)
+      ) {
+        hamburgerRef.current.checked = false;
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [navRef]);
   return (
     <>
       <header className="fixed left-0 right-0 top-0 z-10 h-16 border-b bg-gray-100 p-4 pl-14">
         <h1 className="text-center text-2xl font-bold">{title}</h1>
       </header>
-      <label htmlFor="hamburger" className="cursor-pointer select-none">
+      <label
+        ref={hamburgerLabelRef}
+        htmlFor="hamburger"
+        className="cursor-pointer select-none"
+      >
         <HamburgerSvg
           width={29}
           height={29}
           className="fixed top-4 left-4 z-20 md:hidden"
         />
       </label>
-      <input id="hamburger" type="checkbox" className="peer hidden" />
-      <nav className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white peer-checked:z-10 peer-checked:block md:block">
+      <input
+        ref={hamburgerRef}
+        id="hamburger"
+        type="checkbox"
+        className="peer hidden"
+      />
+      <nav
+        ref={navRef}
+        className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white shadow-lg shadow-gray-400 peer-checked:z-10 peer-checked:block md:block"
+      >
         <ul>
           <li className="border-b hover:bg-gray-100">
             <NavLink
