@@ -10,12 +10,11 @@ import {
   useCatch,
   useLoaderData,
   useParams,
-  useSearchParams,
   useTransition,
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
-import { NestedPageLayout } from "~/utils";
+import { NestedPageLayout, validateHowSoon } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -45,6 +44,7 @@ type ActionData = {
   };
   values?: {
     title: string;
+    howSoon: string;
     description: string;
   };
 };
@@ -53,18 +53,18 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { id } = params;
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData);
-  const { title, from } = formValues;
+  const { title, howSoon } = formValues;
   invariant(
     typeof title === "string" &&
       typeof formValues.description === "string" &&
-      typeof formValues.from
+      validateHowSoon(howSoon)
   );
   const description = formValues.description || null;
   if (title.length === 0) {
     return json<ActionData>(
       {
         errors: { title: "Please, fill out the title" },
-        values: { title, description: formValues.description },
+        values: { title, howSoon, description: formValues.description },
       },
       { status: 400 }
     );
@@ -72,20 +72,19 @@ export const action: ActionFunction = async ({ request, params }) => {
   const user = await requireCurrentUser(request);
   await prisma.task.updateMany({
     where: { id, userId: user.id },
-    data: { title, description, userId: user.id },
+    data: { title, howSoon, description, userId: user.id },
   });
-  return redirect(`/tasks/${id}?from=${from}`);
+  return redirect(`/tasks/${id}`);
 };
 
 export default function New() {
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get("from") || "inbox";
   const { id } = useParams();
   const data = useLoaderData<LoaderData>();
   const actionData = useActionData<ActionData>();
   const transition = useTransition();
+  const howSoon = actionData?.values?.howSoon || data.task.howSoon;
   return (
-    <NestedPageLayout title="Edit task" backTo={`../${id}?from=${from}`}>
+    <NestedPageLayout title="Edit task" backTo={`../${id}`}>
       <Form
         method="post"
         className="mx-auto max-w-3xl space-y-6 py-7 px-4"
@@ -115,6 +114,43 @@ export default function New() {
           </div>
         </div>
         <div>
+          <p className="block text-sm font-medium text-gray-700">How soon</p>
+          <div className="flex flex-wrap gap-3">
+            <div className="mt-1">
+              <input
+                id="inbox"
+                name="howSoon"
+                value="inbox"
+                type="radio"
+                defaultChecked={howSoon === "inbox"}
+                className="peer hidden"
+              />
+              <label
+                htmlFor="inbox"
+                className="block rounded border-2 border-gray-500 px-2 py-1 peer-checked:border-blue-500"
+              >
+                Inbox
+              </label>
+            </div>
+            <div className="mt-1">
+              <input
+                id="today"
+                name="howSoon"
+                value="today"
+                type="radio"
+                defaultChecked={howSoon === "today"}
+                className="peer hidden"
+              />
+              <label
+                htmlFor="today"
+                className="block rounded border-2 border-gray-500 px-2 py-1 peer-checked:border-blue-500"
+              >
+                Today
+              </label>
+            </div>
+          </div>
+        </div>
+        <div>
           <label
             htmlFor="description"
             className="block text-sm font-medium text-gray-700"
@@ -130,7 +166,6 @@ export default function New() {
             />
           </div>
         </div>
-        <input type="hidden" name="from" value={from} />
         <div>
           <button
             type="submit"

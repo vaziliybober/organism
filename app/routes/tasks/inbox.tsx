@@ -7,7 +7,6 @@ import {
   MetaFunction,
   useFetcher,
   useLoaderData,
-  useLocation,
 } from "remix";
 import { prisma } from "~/db.server";
 import PlusSvg from "~/icons/plus";
@@ -76,7 +75,7 @@ function TaskListItem({ task }: { task: Task }) {
   return (
     <li key={task.id} className="relative border-b hover:bg-gray-100">
       <Link
-        to={`/tasks/${task.id}?from=inbox`}
+        to={`/tasks/${task.id}`}
         className="flex items-center justify-between p-4"
       >
         <h2 className="font-bold text-gray-700">{task.title}</h2>

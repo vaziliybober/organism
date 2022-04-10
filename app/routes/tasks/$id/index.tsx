@@ -9,13 +9,12 @@ import {
   redirect,
   useCatch,
   useLoaderData,
-  useSearchParams,
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import PencilSvg from "~/icons/pencil";
 import TrashSvg from "~/icons/trash";
-import { NestedPageLayout } from "~/utils";
+import { capitalizeFirstLetter, NestedPageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -51,15 +50,19 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function TaskRoute() {
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get("from") || "inbox";
   const data = useLoaderData<LoaderData>();
   return (
-    <NestedPageLayout title={data.task.title} backTo={`/tasks/${from}`}>
+    <NestedPageLayout
+      title={data.task.title}
+      backTo={`/tasks/${data.task.howSoon}`}
+    >
       <div className="p-4">
-        <div>Description: {data.task.description}</div>
+        <div className="inline-block rounded border-2 border-blue-500 px-2 py-1">
+          {capitalizeFirstLetter(data.task.howSoon)}
+        </div>
+        <div className="mt-4">Description: {data.task.description}</div>
         <div className="fixed right-5 bottom-5 flex gap-2">
-          <Link to={`edit?from=${from}`}>
+          <Link to="edit">
             <div className="rounded-full border-2 border-gray-700 p-[6px]">
               <PencilSvg width={20} height={20} className="fill-gray-700" />
             </div>

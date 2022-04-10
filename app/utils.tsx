@@ -4,8 +4,18 @@ import classnames from "classnames";
 import HamburgerSvg from "~/icons/hamburger";
 import BackSvg from "./icons/back";
 
+export function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
+}
+
+export function validateHowSoon(
+  howSoon: unknown
+): howSoon is "inbox" | "today" {
+  return howSoon === "inbox" || howSoon === "today";
 }
 
 export function PageLayout({
@@ -94,7 +104,7 @@ export function NestedPageLayout({
 }) {
   return (
     <>
-      <header className="p-4">
+      <header className="border-b p-4">
         <h1 className="text-center text-xl font-bold">{title}</h1>
         <Link
           to={backTo}
