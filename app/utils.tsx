@@ -139,7 +139,7 @@ export function NestedPageLayout({
         <Link
           to={backTo}
           replace
-          className="fixed top-4 left-4 rounded border-2 border-gray-400 hover:border-blue-500"
+          className="absolute top-4 left-4 rounded border-2 border-gray-400 hover:border-blue-500"
         >
           <BackSvg className="fill-gray-700" />
         </Link>

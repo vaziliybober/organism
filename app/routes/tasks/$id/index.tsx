@@ -61,6 +61,7 @@ export default function TaskRoute() {
           {capitalizeFirstLetter(data.task.howSoon)}
         </div>
         <div className="mt-4">Description: {data.task.description}</div>
+        <div className="pb-14" />
         <div className="fixed right-5 bottom-5 flex gap-2">
           <Link to="edit">
             <div className="rounded-full border-2 border-gray-700 p-[6px]">

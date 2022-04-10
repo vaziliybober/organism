@@ -128,42 +128,44 @@ export default function Login() {
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  name="remember"
-                  type="checkbox"
-                  defaultChecked={actionData?.values?.remember}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="remember"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Remember me
-                </label>
+            <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center">
+                  <input
+                    id="remember"
+                    name="remember"
+                    type="checkbox"
+                    defaultChecked={actionData?.values?.remember}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm text-gray-900"
+                  >
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-center text-sm text-gray-500">
+                  Don't have an account?{" "}
+                  <Link className="text-blue-500 underline" to="/join">
+                    Sign up
+                  </Link>
+                </div>
               </div>
-              <div className="text-center text-sm text-gray-500">
-                Don't have an account?{" "}
-                <Link className="text-blue-500 underline" to="/join">
-                  Sign up
+              <div className="mt-4 text-center text-sm text-gray-500">
+                Forgot password?{" "}
+                <Link
+                  className="text-blue-500 underline"
+                  to={{
+                    pathname: "/forgot",
+                    search: actionData?.values?.email
+                      ? `?email=${actionData?.values?.email}`
+                      : "",
+                  }}
+                >
+                  Restore
                 </Link>
               </div>
-            </div>
-            <div className="text-center text-sm text-gray-500">
-              Forgot password?{" "}
-              <Link
-                className="text-blue-500 underline"
-                to={{
-                  pathname: "/forgot",
-                  search: actionData?.values?.email
-                    ? `?email=${actionData?.values?.email}`
-                    : "",
-                }}
-              >
-                Restore
-              </Link>
             </div>
           </Form>
         </div>
