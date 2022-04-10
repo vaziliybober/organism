@@ -18,17 +18,19 @@ import { PageLayout } from "~/utils";
 import invariant from "tiny-invariant";
 
 export const meta: MetaFunction = () => ({
-  title: "Organism | Tasks",
-  description: "Your tasks",
+  title: "Organism | Inbox",
+  description: "Your inbox tasks",
 });
 
 type LoaderData = {
   tasks: Task[];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
+  const howSoon = new URL(request.url).searchParams.get("howSoon");
   const user = await requireCurrentUser(request);
-  const tasks = await prisma.task.findMany({ where: { userId: user.id } });
+  const allTasks = await prisma.task.findMany({ where: { userId: user.id } });
+  const tasks = allTasks.filter((task) => task.howSoon === howSoon);
   return json<LoaderData>({ tasks });
 };
 
@@ -49,13 +51,13 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Index() {
   const data = useLoaderData<LoaderData>();
   return (
-    <PageLayout title="Tasks">
+    <PageLayout title="Inbox">
       <ul className="pb-20">
         {data.tasks.map((task) => (
           <TaskListItem key={task.id} task={task} />
         ))}
       </ul>
-      <Link to="new" className="fixed bottom-5 right-5">
+      <Link to="/tasks/new" className="fixed bottom-5 right-5">
         <PlusSvg className="fill-green-600" width={48} height={48} />
       </Link>
     </PageLayout>
@@ -73,7 +75,10 @@ function TaskListItem({ task }: { task: Task }) {
   }, [task.completed, fetcher.state]);
   return (
     <li key={task.id} className="relative border-b hover:bg-gray-100">
-      <Link to={task.id} className="flex items-center justify-between p-4">
+      <Link
+        to={`/tasks/${task.id}`}
+        className="flex items-center justify-between p-4"
+      >
         <h2 className="font-bold text-gray-700">{task.title}</h2>
       </Link>
       <fetcher.Form

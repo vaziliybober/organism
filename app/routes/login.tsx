@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formValues = Object.fromEntries(formData);
   const { email, password } = formValues;
   invariant(typeof email === "string" && typeof password === "string");
-  const remember = !!formValues.remember;
+  const remember = formValues.remember === "on";
   const user = await prisma.user.findUnique({
     where: { email },
     include: {

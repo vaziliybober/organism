@@ -1,10 +1,35 @@
 import { ReactNode } from "react";
-import { NavLink } from "remix";
+import { Link, NavLink, useLocation, useSearchParams } from "remix";
 import classnames from "classnames";
 import HamburgerSvg from "~/icons/hamburger";
 
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
+}
+
+function TaskNavLink({
+  howSoon = null,
+  children,
+}: {
+  howSoon?: string | null;
+  children: ReactNode;
+}) {
+  const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
+  const isActive =
+    pathname === "/tasks" && searchParams.get("howSoon") === howSoon;
+  const search = howSoon ? `?howSoon=${howSoon}` : "";
+  return (
+    <Link
+      className={classnames("block", "p-3", {
+        "text-blue-600": isActive,
+        "font-bold": isActive,
+      })}
+      to={`/tasks${search}`}
+    >
+      {children}
+    </Link>
+  );
 }
 
 export function PageLayout({
@@ -30,17 +55,10 @@ export function PageLayout({
       <nav className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white peer-checked:z-10 peer-checked:block md:block">
         <ul>
           <li className="border-b hover:bg-gray-100">
-            <NavLink
-              to="/tasks"
-              className={({ isActive }) =>
-                classnames("block", "p-3", {
-                  "text-blue-600": isActive,
-                  "font-bold": isActive,
-                })
-              }
-            >
-              Tasks
-            </NavLink>
+            <TaskNavLink>Inbox</TaskNavLink>
+          </li>
+          <li className="border-b hover:bg-gray-100">
+            <TaskNavLink howSoon="TODAY">Today</TaskNavLink>
           </li>
           <li className="border-b hover:bg-gray-100">
             <NavLink
