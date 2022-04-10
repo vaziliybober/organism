@@ -28,7 +28,7 @@ model Task {
   id          String   @id @default(cuid())
   title       String
   description String?
-  howSoon     String?
+  howSoon     String   @default("inbox")
   completed   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

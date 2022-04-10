@@ -1,36 +1,11 @@
 import { ReactNode } from "react";
-import { Link, NavLink, useLocation, useSearchParams } from "remix";
+import { Link, NavLink } from "remix";
 import classnames from "classnames";
 import HamburgerSvg from "~/icons/hamburger";
 import BackSvg from "./icons/back";
 
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
-}
-
-function TaskNavLink({
-  howSoon = null,
-  children,
-}: {
-  howSoon?: string | null;
-  children: ReactNode;
-}) {
-  const [searchParams] = useSearchParams();
-  const { pathname } = useLocation();
-  const isActive =
-    pathname === "/tasks" && searchParams.get("howSoon") === howSoon;
-  const search = howSoon ? `?howSoon=${howSoon}` : "";
-  return (
-    <Link
-      className={classnames("block", "p-3", {
-        "text-blue-600": isActive,
-        "font-bold": isActive,
-      })}
-      to={`/tasks${search}`}
-    >
-      {children}
-    </Link>
-  );
 }
 
 export function PageLayout({
@@ -56,10 +31,30 @@ export function PageLayout({
       <nav className="fixed top-0 left-0 mt-16 hidden h-[calc(100vh-4rem)] w-72 border-r bg-white peer-checked:z-10 peer-checked:block md:block">
         <ul>
           <li className="border-b hover:bg-gray-100">
-            <TaskNavLink>Inbox</TaskNavLink>
+            <NavLink
+              to="/tasks/inbox"
+              className={({ isActive }) =>
+                classnames("block", "p-3", {
+                  "text-blue-600": isActive,
+                  "font-bold": isActive,
+                })
+              }
+            >
+              Inbox
+            </NavLink>
           </li>
           <li className="border-b hover:bg-gray-100">
-            <TaskNavLink howSoon="TODAY">Today</TaskNavLink>
+            <NavLink
+              to="/tasks/today"
+              className={({ isActive }) =>
+                classnames("block", "p-3", {
+                  "text-blue-600": isActive,
+                  "font-bold": isActive,
+                })
+              }
+            >
+              Today
+            </NavLink>
           </li>
           <li className="border-b hover:bg-gray-100">
             <NavLink
@@ -88,14 +83,28 @@ export function PageLayout({
   );
 }
 
-export function BackLink({ to = ".." }) {
+export function NestedPageLayout({
+  title,
+  backTo = "..",
+  children,
+}: {
+  title?: string;
+  backTo?: string;
+  children?: ReactNode;
+}) {
   return (
-    <Link
-      to={to}
-      replace
-      className="fixed top-4 left-4 rounded border-2 border-gray-400 hover:border-blue-500"
-    >
-      <BackSvg className="fill-gray-700" />
-    </Link>
+    <>
+      <header className="p-4">
+        <h1 className="text-center text-xl font-bold">{title}</h1>
+        <Link
+          to={backTo}
+          replace
+          className="fixed top-4 left-4 rounded border-2 border-gray-400 hover:border-blue-500"
+        >
+          <BackSvg className="fill-gray-700" />
+        </Link>
+      </header>
+      <main>{children}</main>
+    </>
   );
 }

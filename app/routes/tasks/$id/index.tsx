@@ -9,12 +9,13 @@ import {
   redirect,
   useCatch,
   useLoaderData,
+  useSearchParams,
 } from "remix";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
 import PencilSvg from "~/icons/pencil";
 import TrashSvg from "~/icons/trash";
-import { BackLink } from "~/utils";
+import { NestedPageLayout } from "~/utils";
 import { requireCurrentUser } from "~/utils.server";
 
 export const meta: MetaFunction = ({ data }) => {
@@ -50,17 +51,15 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function TaskRoute() {
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get("from") || "inbox";
   const data = useLoaderData<LoaderData>();
   return (
-    <>
-      <BackLink />
-      <header className="p-4">
-        <h2 className="text-center font-bold">{data.task.title}</h2>
-      </header>
-      <main className="p-4">
+    <NestedPageLayout title={data.task.title} backTo={`/tasks/${from}`}>
+      <div className="p-4">
         <div>Description: {data.task.description}</div>
         <div className="fixed right-5 bottom-5 flex gap-2">
-          <Link to="edit">
+          <Link to={`edit?from=${from}`}>
             <div className="rounded-full border-2 border-gray-700 p-[6px]">
               <PencilSvg width={20} height={20} className="fill-gray-700" />
             </div>
@@ -75,8 +74,8 @@ export default function TaskRoute() {
             </button>
           </Form>
         </div>
-      </main>
-    </>
+      </div>
+    </NestedPageLayout>
   );
 }
 
