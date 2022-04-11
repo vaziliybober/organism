@@ -91,7 +91,10 @@ export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   const transition = useTransition();
   return (
-    <NestedPageLayout title={"Task"} backTo="/tasks">
+    <NestedPageLayout
+      title={"Task"}
+      backTo={data.task.from || data.task.to ? "/tasks" : "/tasks/inbox"}
+    >
       <div className="p-4">
         <h2 className="text-center text-xl font-medium mb-4">
           {data.task.title}

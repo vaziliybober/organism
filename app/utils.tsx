@@ -66,7 +66,21 @@ export function PageLayout({
         <ul>
           <li className="border-b hover:bg-gray-100">
             <NavLink
+              to="/tasks/inbox"
+              className={({ isActive }) =>
+                classnames("block", "p-3", {
+                  "text-blue-600": isActive,
+                  "font-bold": isActive,
+                })
+              }
+            >
+              Inbox
+            </NavLink>
+          </li>
+          <li className="border-b hover:bg-gray-100">
+            <NavLink
               to="/tasks"
+              end
               className={({ isActive }) =>
                 classnames("block", "p-3", {
                   "text-blue-600": isActive,

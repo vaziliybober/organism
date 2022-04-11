@@ -70,7 +70,7 @@ export const action: ActionFunction = async ({ request }) => {
       userId: user.id,
     },
   });
-  return redirect("/tasks");
+  return redirect(from || to ? "/tasks" : "/tasks/inbox");
 };
 
 export default function New() {

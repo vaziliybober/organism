@@ -75,7 +75,6 @@ const dates = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  console.log(dates);
   const user = await requireCurrentUser(request);
   const tasks = await prisma.task.findMany({
     where: { userId: user.id },
@@ -223,6 +222,7 @@ export default function Index() {
       <TasksSection title="This Year" tasks={data.thisYear} />
       <TasksSection title="Next Year" tasks={data.nextYear} />
       <TasksSection title="Not Very Soon" tasks={data.notVerySoon} />
+      <div className="h-20" />
       <Link to="/tasks/new" className="fixed bottom-5 right-5">
         <PlusSvg className="fill-green-600" width={48} height={48} />
       </Link>
@@ -235,15 +235,17 @@ function TasksSection({
   title,
 }: {
   tasks: LoaderTask[];
-  title: string;
+  title?: string;
 }) {
   return (
     <>
-      <h2
-        className={classNames("p-2", { "text-gray-400": tasks.length === 0 })}
-      >
-        {title}
-      </h2>
+      {title && (
+        <h2
+          className={classNames("p-2", { "text-gray-400": tasks.length === 0 })}
+        >
+          {title}
+        </h2>
+      )}
       <ul>
         {tasks.map((task) => (
           <TaskListItem key={task.id} task={task} />
