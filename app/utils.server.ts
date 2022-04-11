@@ -81,10 +81,20 @@ export async function requireCurrentUser(request: Request) {
   return user;
 }
 
-export function dateToIso(date: Date, format = "date") {
+export function dateToIso(date: Date | null) {
+  if (!date) {
+    return "";
+  }
   const offset = date.getTimezoneOffset();
   const isoDateTime = new Date(date.getTime() - offset * 60 * 1000)
     .toISOString()
     .split("Z")[0];
   return isoDateTime;
+}
+
+export function dateToString(date: Date | null) {
+  if (!date) {
+    return "";
+  }
+  return date.toLocaleString("ru-RU");
 }

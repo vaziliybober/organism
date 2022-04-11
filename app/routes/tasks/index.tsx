@@ -1,4 +1,3 @@
-import { Task } from "@prisma/client";
 import {
   ActionFunction,
   json,
@@ -12,7 +11,7 @@ import { prisma } from "~/db.server";
 import PlusSvg from "~/icons/plus";
 import NotTickedSvg from "~/icons/not-ticked";
 import Ticked from "~/icons/ticked";
-import { requireCurrentUser } from "~/utils.server";
+import { dateToString, requireCurrentUser } from "~/utils.server";
 import { PageLayout } from "~/utils";
 import invariant from "tiny-invariant";
 import classNames from "classnames";
@@ -22,16 +21,40 @@ export const meta: MetaFunction = () => ({
   description: "Your tasks",
 });
 
+type LoaderTask = {
+  id: string;
+  title: string;
+  from: string | null;
+  to: string | null;
+  completed: boolean;
+  description: string;
+};
+
 type LoaderData = {
-  tasks: Task[];
+  tasks: LoaderTask[];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
   const tasks = await prisma.task.findMany({
     where: { userId: user.id },
+    select: {
+      id: true,
+      title: true,
+      from: true,
+      to: true,
+      completed: true,
+      description: true,
+    },
   });
-  return json<LoaderData>({ tasks });
+  return json<LoaderData>({
+    tasks: tasks.map((task) => ({
+      ...task,
+      from: dateToString(task.from),
+      to: dateToString(task.to),
+      description: task.description || "",
+    })),
+  });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -73,7 +96,7 @@ export default function Index() {
   );
 }
 
-function TaskListItem({ task }: { task: Task }) {
+function TaskListItem({ task }: { task: LoaderTask }) {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.submission?.formData.get("taskId") === task.id;
   return (
@@ -86,9 +109,17 @@ function TaskListItem({ task }: { task: Task }) {
     >
       <Link
         to={`/tasks/${task.id}`}
-        className="flex items-center justify-between p-4"
+        className="px-3 py-1 flex items-center min-h-[38px]"
       >
-        <h2 className="font-bold text-gray-700">{task.title}</h2>
+        <div>
+          <h2 className="font-bold text-gray-700">{task.title}</h2>
+          <div className="text-xs text-gray-600">
+            {task.from && <div className="font-mono">From: {task.from}</div>}
+            {task.to && (
+              <div className="font-mono">To: &nbsp;&nbsp;{task.to}</div>
+            )}
+          </div>
+        </div>
       </Link>
       <fetcher.Form
         method="post"

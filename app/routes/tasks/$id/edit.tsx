@@ -41,8 +41,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json<LoaderData>({
     task: {
       ...task,
-      from: task.from ? dateToIso(task.from) : null,
-      to: task.to ? dateToIso(task.to) : null,
+      from: dateToIso(task.from),
+      to: dateToIso(task.to),
     },
   });
 };
