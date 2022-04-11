@@ -134,5 +134,11 @@ export function isoToString(date: string) {
   if (!date) {
     return "";
   }
-  return new Date(date).toLocaleString("ru-RU");
+  return new Date(date).toLocaleString("ru-RU", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
