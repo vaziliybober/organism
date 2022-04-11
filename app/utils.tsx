@@ -93,6 +93,19 @@ export function PageLayout({
           </li>
           <li className="border-b hover:bg-gray-100">
             <NavLink
+              to="/tasks/completed"
+              className={({ isActive }) =>
+                classnames("block", "p-3", {
+                  "text-blue-600": isActive,
+                  "font-bold": isActive,
+                })
+              }
+            >
+              Completed
+            </NavLink>
+          </li>
+          <li className="border-b hover:bg-gray-100">
+            <NavLink
               to="/account"
               className={({ isActive }) =>
                 classnames("block", "p-3", {

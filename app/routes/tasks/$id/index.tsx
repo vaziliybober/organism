@@ -1,4 +1,5 @@
 import { Task } from "@prisma/client";
+import moment from "moment";
 import {
   ActionFunction,
   Form,
@@ -38,6 +39,7 @@ type LoaderTask = {
 
 type LoaderData = {
   task: LoaderTask;
+  backTo: string;
 };
 
 function convert(task: Task) {
@@ -49,6 +51,38 @@ function convert(task: Task) {
   };
 }
 
+const dates = {
+  aLongTimeAgo: moment().startOf("year").toDate(),
+  lastYear: moment().subtract(1, "month").startOf("month").toDate(),
+  lastMonth: moment().subtract(1, "week").startOf("week").toDate(),
+  lastWeek: moment().subtract(1, "day").startOf("day").toDate(),
+  yesterday: moment().startOf("day").toDate(),
+  today: moment().add(1, "day").startOf("day").toDate(),
+  tomorrow: moment().add(1, "day").endOf("day").toDate(),
+  thisWeek: moment().endOf("week").toDate(),
+  nextWeek: moment().add(1, "week").endOf("week").toDate(),
+  thisMonth: moment().endOf("month").toDate(),
+  nextMonth: moment().add(1, "month").endOf("month").toDate(),
+  thisYear: moment().endOf("year").toDate(),
+  nextYear: moment().add(1, "year").endOf("year").toDate(),
+};
+
+const isALongTimeAgo = (task: Task) => {
+  return !task.completed && task.to && task.to < dates.aLongTimeAgo;
+};
+const isLastYear = (task: Task) => {
+  return task.to && task.to >= dates.aLongTimeAgo && task.to < dates.lastYear;
+};
+const isLastMonth = (task: Task) => {
+  return task.to && task.to >= dates.lastYear && task.to < dates.lastMonth;
+};
+const isLastWeek = (task: Task) => {
+  return task.to && task.to >= dates.lastMonth && task.to < dates.lastWeek;
+};
+const isYesterday = (task: Task) => {
+  return task.to && task.to >= dates.lastWeek && task.to < dates.yesterday;
+};
+
 export const loader: LoaderFunction = async ({ request, params }) => {
   const user = await requireCurrentUser(request);
   const { id } = params;
@@ -57,7 +91,19 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!task) {
     throw new Response("Not found", { status: 404 });
   }
-  return json<LoaderData>({ task: convert(task) });
+  const backTo =
+    !task.from && !task.to
+      ? "/tasks/inbox"
+      : task.completed &&
+        (isALongTimeAgo(task) ||
+          isLastYear(task) ||
+          isLastMonth(task) ||
+          isLastWeek(task) ||
+          isYesterday(task))
+      ? "/tasks/completed"
+      : "/tasks";
+
+  return json<LoaderData>({ task: convert(task), backTo });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -91,10 +137,7 @@ export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   const transition = useTransition();
   return (
-    <NestedPageLayout
-      title={"Task"}
-      backTo={data.task.from || data.task.to ? "/tasks" : "/tasks/inbox"}
-    >
+    <NestedPageLayout title={"Task"} backTo={data.backTo}>
       <div className="p-4">
         <h2 className="text-center text-xl font-medium mb-4">
           {data.task.title}

@@ -77,43 +77,23 @@ const dates = {
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
   const tasks = await prisma.task.findMany({
-    where: { userId: user.id },
-    orderBy: [{ completed: "asc" }, { from: "asc" }, { to: "asc" }],
+    where: { userId: user.id, completed: true },
+    orderBy: [{ from: "asc" }, { to: "asc" }],
   });
   const isALongTimeAgo = (task: Task) => {
-    return !task.completed && task.to && task.to < dates.aLongTimeAgo;
+    return task.to && task.to < dates.aLongTimeAgo;
   };
   const isLastYear = (task: Task) => {
-    return (
-      !task.completed &&
-      task.to &&
-      task.to >= dates.aLongTimeAgo &&
-      task.to < dates.lastYear
-    );
+    return task.to && task.to >= dates.aLongTimeAgo && task.to < dates.lastYear;
   };
   const isLastMonth = (task: Task) => {
-    return (
-      !task.completed &&
-      task.to &&
-      task.to >= dates.lastYear &&
-      task.to < dates.lastMonth
-    );
+    return task.to && task.to >= dates.lastYear && task.to < dates.lastMonth;
   };
   const isLastWeek = (task: Task) => {
-    return (
-      !task.completed &&
-      task.to &&
-      task.to >= dates.lastMonth &&
-      task.to < dates.lastWeek
-    );
+    return task.to && task.to >= dates.lastMonth && task.to < dates.lastWeek;
   };
   const isYesterday = (task: Task) => {
-    return (
-      !task.completed &&
-      task.to &&
-      task.to >= dates.lastWeek &&
-      task.to < dates.yesterday
-    );
+    return task.to && task.to >= dates.lastWeek && task.to < dates.yesterday;
   };
   const isToday = (task: Task) => {
     return (
@@ -227,7 +207,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Index() {
   const data = useLoaderData<LoaderData>();
   return (
-    <PageLayout title="Tasks">
+    <PageLayout title="Completed">
       <TasksSection title="A Long Time Ago" tasks={data.aLongTimeAgo} />
       <TasksSection title="Last Year" tasks={data.lastYear} />
       <TasksSection title="Last Month" tasks={data.lastMonth} />
