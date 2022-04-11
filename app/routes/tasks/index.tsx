@@ -11,10 +11,16 @@ import { prisma } from "~/db.server";
 import PlusSvg from "~/icons/plus";
 import NotTickedSvg from "~/icons/not-ticked";
 import Ticked from "~/icons/ticked";
-import { dateToString, requireCurrentUser } from "~/utils.server";
-import { PageLayout } from "~/utils";
+import {
+  dateToIso,
+  getDayFromNow,
+  requireCurrentUser,
+  startOfDay,
+} from "~/utils.server";
+import { PageLayout, isoToString } from "~/utils";
 import invariant from "tiny-invariant";
 import classNames from "classnames";
+import { Task } from "@prisma/client";
 
 export const meta: MetaFunction = () => ({
   title: "Organism | Tasks",
@@ -31,29 +37,60 @@ type LoaderTask = {
 };
 
 type LoaderData = {
-  tasks: LoaderTask[];
+  today: LoaderTask[];
+  tomorrow: LoaderTask[];
 };
+
+function convert(task: Task) {
+  return {
+    ...task,
+    from: dateToIso(task.from),
+    to: dateToIso(task.to),
+    description: task.description || "",
+  };
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireCurrentUser(request);
   const tasks = await prisma.task.findMany({
     where: { userId: user.id },
-    select: {
-      id: true,
-      title: true,
-      from: true,
-      to: true,
-      completed: true,
-      description: true,
-    },
   });
+  const isToday = (task: Task) => {
+    if (task.completed) return false;
+    if (
+      task.to &&
+      task.to >= startOfDay(getDayFromNow(0)) &&
+      task.to < startOfDay(getDayFromNow(1))
+    )
+      return true;
+    if (
+      task.from &&
+      task.from >= startOfDay(getDayFromNow(0)) &&
+      task.from < startOfDay(getDayFromNow(1))
+    )
+      return true;
+    return false;
+  };
+  const isTomorrow = (task: Task) => {
+    if (isToday(task)) return false;
+    if (task.completed) return false;
+    if (
+      task.to &&
+      task.to >= startOfDay(getDayFromNow(1)) &&
+      task.to < startOfDay(getDayFromNow(2))
+    )
+      return true;
+    if (
+      task.from &&
+      task.from >= startOfDay(getDayFromNow(1)) &&
+      task.from < startOfDay(getDayFromNow(2))
+    )
+      return true;
+    return false;
+  };
   return json<LoaderData>({
-    tasks: tasks.map((task) => ({
-      ...task,
-      from: dateToString(task.from),
-      to: dateToString(task.to),
-      description: task.description || "",
-    })),
+    today: tasks.filter(isToday).map(convert),
+    tomorrow: tasks.filter(isTomorrow).map(convert),
   });
 };
 
@@ -82,10 +119,18 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Index() {
   const data = useLoaderData<LoaderData>();
+  // console.log(data);
   return (
     <PageLayout title="Tasks">
+      <h2 className="p-2">Today</h2>
       <ul>
-        {data.tasks.map((task) => (
+        {data.today.map((task) => (
+          <TaskListItem key={task.id} task={task} />
+        ))}
+      </ul>
+      <h2 className="p-2">Tomorrow</h2>
+      <ul>
+        {data.tomorrow.map((task) => (
           <TaskListItem key={task.id} task={task} />
         ))}
       </ul>
@@ -114,9 +159,13 @@ function TaskListItem({ task }: { task: LoaderTask }) {
         <div>
           <h2 className="font-bold text-gray-700">{task.title}</h2>
           <div className="text-xs text-gray-600">
-            {task.from && <div className="font-mono">From: {task.from}</div>}
+            {task.from && (
+              <div className="font-mono">From: {isoToString(task.from)}</div>
+            )}
             {task.to && (
-              <div className="font-mono">To: &nbsp;&nbsp;{task.to}</div>
+              <div className="font-mono">
+                To: &nbsp;&nbsp;{isoToString(task.to)}
+              </div>
             )}
           </div>
         </div>

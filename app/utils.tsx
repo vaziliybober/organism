@@ -129,3 +129,10 @@ export function NestedPageLayout({
     </>
   );
 }
+
+export function isoToString(date: string) {
+  if (!date) {
+    return "";
+  }
+  return new Date(date).toLocaleString("ru-RU");
+}
