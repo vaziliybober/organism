@@ -91,16 +91,3 @@ export function dateToIso(date: Date | null) {
     .split("Z")[0];
   return isoDateTime;
 }
-
-export function getDayFromNow(day: number) {
-  const dayFromNow = new Date();
-  dayFromNow.setDate(new Date().getDate() + day);
-  return dayFromNow;
-}
-
-export function startOfDay(date: Date) {
-  const offset = date.getTimezoneOffset();
-  const newDate = new Date(date);
-  newDate.setUTCHours(0, 0, 0, 0);
-  return new Date(newDate.getTime() + offset * 60 * 1000);
-}
