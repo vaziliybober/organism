@@ -97,8 +97,8 @@ export const action: ActionFunction = async ({ request, params }) => {
     data: {
       title,
       description: description || null,
-      from: from ? new Date(from) : null,
-      to: to ? new Date(to) : null,
+      from: from ? new Date(from + "+03:00") : null,
+      to: to ? new Date(to + "+03:00") : null,
     },
   });
   return redirect(`/tasks/${id}`);

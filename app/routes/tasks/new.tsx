@@ -34,6 +34,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData);
   const { title, description, from, to } = formValues;
+  console.log(from);
   invariant(
     typeof title === "string" &&
       typeof description === "string" &&
@@ -65,8 +66,8 @@ export const action: ActionFunction = async ({ request }) => {
     data: {
       title,
       description: description || null,
-      from: from ? new Date(from) : null,
-      to: to ? new Date(to) : null,
+      from: from ? new Date(from + "+03:00") : null,
+      to: to ? new Date(to + "+03:00") : null,
       userId: user.id,
     },
   });
