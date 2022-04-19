@@ -136,6 +136,10 @@ export const action: ActionFunction = async ({ request }) => {
 export default function TaskRoute() {
   const data = useLoaderData<LoaderData>();
   const transition = useTransition();
+  const tickRestoring =
+    transition.submission?.formData.get("_action")?.toString() === "restore";
+  const tickFinishing =
+    transition.submission?.formData.get("_action")?.toString() === "finish";
   return (
     <NestedPageLayout title={"Task"} backTo={data.backTo}>
       <div className="p-4">
@@ -159,16 +163,18 @@ export default function TaskRoute() {
             <button
               type="submit"
               name="_action"
-              value={data.task.completed ? "restore" : "finish"}
-              disabled={
-                ["restore", "finish"].includes(
-                  transition.submission?.formData.get("_action")?.toString() ||
-                    ""
-                ) && transition.state === "submitting"
+              value={
+                tickRestoring
+                  ? "finish"
+                  : tickFinishing
+                  ? "restore"
+                  : data.task.completed
+                  ? "restore"
+                  : "finish"
               }
               className="no-tap-highlight"
             >
-              {data.task.completed ? (
+              {tickFinishing || (!tickRestoring && data.task.completed) ? (
                 <TickedSvg width={36} height={36} className="fill-green-700" />
               ) : (
                 <NotTickedSvg
