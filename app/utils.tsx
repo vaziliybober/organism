@@ -161,7 +161,9 @@ export function isoToString(date: string) {
   if (!date) {
     return "";
   }
-  return new Date(date).toLocaleString("ru-RU", {
+  return new Date(
+    date + (typeof window === "undefined" ? "" : "+00:00")
+  ).toLocaleString("ru-RU", {
     year: "numeric",
     month: "numeric",
     day: "numeric",
